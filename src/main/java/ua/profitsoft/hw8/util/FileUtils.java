@@ -15,16 +15,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 
-public class ZipMagic {
+public class FileUtils {
     private static final String FILE_DIRECTORY = "src/main/resources/temp";
 
-    public static void unzipFile(MultipartFile file) {
-        Path path = getZip(file);
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(path.toString()))) {
+    public static File unzipFile(MultipartFile file) {
+        Path zip = getZip(file);
+        File newFile = new File(FILE_DIRECTORY);
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zip.toString()))) {
             byte[] buffer = new byte[1024];
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
-                File newFile = newFile(new File(FILE_DIRECTORY), zipEntry);
+                newFile = newFile(new File(FILE_DIRECTORY), zipEntry);
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs())
                         throw new IOException("Failed to create directory " + newFile);
@@ -40,15 +41,16 @@ public class ZipMagic {
                 }
                 zipEntry = zis.getNextEntry();
             }
-            path.toFile().delete();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to unzip file: " + path.getFileName());
+            throw new RuntimeException("Failed to unzip file: " + zip.getFileName());
         }
+        zip.toFile().delete();
+        return newFile;
     }
 
     private static Path getZip(MultipartFile file) {
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        Path path = Paths.get(FILE_DIRECTORY + '/' + fileName);
+        Path path = Paths.get(FILE_DIRECTORY +'/'+ fileName);
         try {
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ioe) {
@@ -63,7 +65,6 @@ public class ZipMagic {
         String destFilePath = destFile.getCanonicalPath();
         if (!destFilePath.startsWith(destDirPath + File.separator))
             throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-
         return destFile;
     }
 }

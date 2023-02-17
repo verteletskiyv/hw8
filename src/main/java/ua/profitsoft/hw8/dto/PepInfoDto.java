@@ -6,12 +6,10 @@ import lombok.Setter;
 
 @Getter @Setter
 @Builder
-public class PepDto {
+public class PepInfoDto {
     private String full_name;
     private String full_name_en;
     private String date_of_birth;
-    private String photo;
+    private Boolean died;
     private String url;
-    private String wiki_en;
-    private String wiki_uk;
 }

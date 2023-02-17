@@ -1,4 +1,4 @@
-package ua.profitsoft.homework5.dto;
+package ua.profitsoft.hw8.dto;
 
 import lombok.Builder;
 import lombok.Getter;
