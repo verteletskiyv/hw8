@@ -43,8 +43,9 @@ public class FileUtils {
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to unzip file: " + zip.getFileName());
+        } finally {
+            zip.toFile().delete();
         }
-        zip.toFile().delete();
         return newFile;
     }
 

@@ -48,8 +48,9 @@ public class PepService {
             peps.clear();
         } catch (IOException e) {
             throw new InvalidJsonException();
+        } finally {
+            file.delete();
         }
-        file.delete();
     }
 
     public PageDto<PepInfoDto> search(PepQueryDto query) {
