@@ -50,6 +50,7 @@ public class FileUtils {
     }
 
     public static Path getFile(MultipartFile file) {
+        new File(FILE_DIRECTORY).mkdirs();
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         Path path = Paths.get(FILE_DIRECTORY +'/'+ fileName);
         try {
