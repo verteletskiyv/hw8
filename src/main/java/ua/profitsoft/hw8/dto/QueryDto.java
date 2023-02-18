@@ -6,7 +6,6 @@ import lombok.Setter;
 
 @Getter @Setter
 public class QueryDto {
-
     @Min(0)
     private Integer page = 0;
 

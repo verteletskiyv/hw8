@@ -11,11 +11,8 @@ import java.util.function.Function;
 @Builder
 @Jacksonized
 public class PageDto<T> {
-
     private List<T> list;
-
     private long totalPages;
-
     private long totalSize;
 
     public static <T, D> PageDto<D> fromPage(Page<T> page, Function<T, D> convertFunction) {

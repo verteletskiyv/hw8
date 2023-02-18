@@ -16,10 +16,10 @@ import java.util.zip.ZipInputStream;
 
 
 public class FileUtils {
-    private static final String FILE_DIRECTORY = "src/main/resources/temp";
+    public static final String FILE_DIRECTORY = "src/main/resources/temp";
 
-    public static File unzipFile(MultipartFile file) {
-        Path zip = getZip(file);
+    public static File getUnzippedFile(MultipartFile file) {
+        Path zip = getFile(file);
         File newFile = new File(FILE_DIRECTORY);
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zip.toString()))) {
             byte[] buffer = new byte[1024];
@@ -48,13 +48,13 @@ public class FileUtils {
         return newFile;
     }
 
-    private static Path getZip(MultipartFile file) {
+    public static Path getFile(MultipartFile file) {
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         Path path = Paths.get(FILE_DIRECTORY +'/'+ fileName);
         try {
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to process file: " + fileName +"; "+e.getMessage());
         }
         return path;
     }

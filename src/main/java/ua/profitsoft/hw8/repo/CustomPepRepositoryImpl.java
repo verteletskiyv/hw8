@@ -14,7 +14,6 @@ import ua.profitsoft.hw8.dto.PepQueryDto;
 import org.springframework.data.mongodb.core.query.Query;
 import org.apache.commons.lang3.StringUtils;
 import ua.profitsoft.hw8.dto.PepTopNamesDto;
-
 import java.util.List;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -22,6 +21,18 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 @RequiredArgsConstructor
 public class CustomPepRepositoryImpl implements CustomPepRepository {
     private final MongoTemplate mongoTemplate;
+
+    public List<PepTopNamesDto> findTopTenNames() {
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("is_pep").is(true)),
+                Aggregation.group("first_name").count().as("count"),
+                Aggregation.sort(Sort.Direction.DESC, "count"),
+                Aggregation.limit(10),
+                Aggregation.project("count").and("_id").as("name"));
+        return mongoTemplate
+                .aggregate(aggregation, "pep", PepTopNamesDto.class)
+                .getMappedResults();
+    }
 
     @Override
     public Page<Pep> search(PepQueryDto query) {
@@ -47,17 +58,5 @@ public class CustomPepRepositoryImpl implements CustomPepRepository {
 
         return PageableExecutionUtils.getPage(peps, pageRequest,
                 () -> mongoTemplate.count((Query.of(mongoQuery).limit(-1).skip(-1)), Pep.class));
-    }
-
-    public List<PepTopNamesDto> findTopTenNames() {
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("is_pep").is(false)),
-                Aggregation.group("first_name").count().as("count"),
-                Aggregation.sort(Sort.Direction.DESC, "count"),
-                Aggregation.limit(10),
-                Aggregation.project("count").and("_id").as("name"));
-        return mongoTemplate
-                .aggregate(aggregation, "pep", PepTopNamesDto.class)
-                .getMappedResults();
     }
 }

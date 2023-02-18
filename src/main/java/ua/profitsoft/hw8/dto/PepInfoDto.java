@@ -1,11 +1,15 @@
 package ua.profitsoft.hw8.dto;
 
 import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter @Setter
 public class PepInfoDto {
     private String full_name;
     private String full_name_en;

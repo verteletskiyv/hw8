@@ -11,11 +11,13 @@ import ua.profitsoft.hw8.dto.PageDto;
 import ua.profitsoft.hw8.dto.PepInfoDto;
 import ua.profitsoft.hw8.dto.PepQueryDto;
 import ua.profitsoft.hw8.dto.PepTopNamesDto;
+import ua.profitsoft.hw8.exception.InvalidJsonException;
 import ua.profitsoft.hw8.repo.PepRepository;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +29,8 @@ public class PepService {
 
     public void upload(File file) {
         repository.deleteAll();
+        // x2 performance with bulk update
+        List<Pep> peps = new ArrayList<>(100);
         try (BufferedReader reader = new BufferedReader(new FileReader(file));
              JsonParser jsonParser = JSON_MAPPER.getFactory().createParser(reader)) {
             if (jsonParser.nextToken() != JsonToken.START_ARRAY)
@@ -34,10 +38,16 @@ public class PepService {
             while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
                 Pep pep = JSON_MAPPER.readValue(jsonParser, Pep.class);
                 pep.setId(UUID.randomUUID().toString());
-                repository.save(pep);
+                peps.add(pep);
+                if (peps.size() > 99) {
+                    repository.insert(peps);
+                    peps.clear();
+                }
             }
+            repository.insert(peps);
+            peps.clear();
         } catch (IOException e) {
-            throw new RuntimeException("File reading failure: " + e.getMessage());
+            throw new InvalidJsonException();
         }
         file.delete();
     }
