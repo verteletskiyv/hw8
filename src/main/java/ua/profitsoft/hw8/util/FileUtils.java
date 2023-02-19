@@ -16,16 +16,15 @@ import java.util.zip.ZipInputStream;
 
 
 public class FileUtils {
-    public static final String FILE_DIRECTORY = "src/main/resources/temp";
 
-    public static File getUnzippedFile(MultipartFile file) {
-        Path zip = getFile(file);
-        File newFile = new File(FILE_DIRECTORY);
+    public static File getUnzippedFile(MultipartFile file, File tempDir) {
+        Path zip = getFile(file, tempDir);
+        File newFile = tempDir;
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zip.toString()))) {
             byte[] buffer = new byte[1024];
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
-                newFile = newFile(new File(FILE_DIRECTORY), zipEntry);
+                newFile = newFile(tempDir, zipEntry);
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs())
                         throw new IOException("Failed to create directory " + newFile);
@@ -49,10 +48,10 @@ public class FileUtils {
         return newFile;
     }
 
-    public static Path getFile(MultipartFile file) {
-        new File(FILE_DIRECTORY).mkdirs();
+    public static Path getFile(MultipartFile file, File tempDir) {
+        tempDir.mkdirs();
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        Path path = Paths.get(FILE_DIRECTORY +'/'+ fileName);
+        Path path = Paths.get(tempDir.toString() +'/'+ fileName);
         try {
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {

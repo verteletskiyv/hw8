@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ua.profitsoft.hw8.dto.RestResponse;
+import ua.profitsoft.hw8.exception.EmptyFileException;
 import ua.profitsoft.hw8.exception.InvalidFileTypeException;
 import ua.profitsoft.hw8.exception.InvalidJsonException;
-import java.io.FileNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    private RestResponse handleException(FileNotFoundException e) {
+    private RestResponse handleException(EmptyFileException e) {
         return new RestResponse("File reading failure: Unable to locate");
     }
 }
