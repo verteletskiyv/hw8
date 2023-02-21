@@ -2,6 +2,7 @@ package ua.profitsoft.hw8.util;
 
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import ua.profitsoft.hw8.controller.PepController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,6 +16,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 
+/**
+ * Creates temporary files in {@link PepController#upload(MultipartFile) method}.
+ */
 public class FileUtils {
 
     public static File getUnzippedFile(MultipartFile file, File tempDir) {

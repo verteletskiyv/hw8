@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ua.profitsoft.hw8.dto.*;
 import ua.profitsoft.hw8.exception.EmptyFileException;
 import ua.profitsoft.hw8.exception.InvalidFileTypeException;
-import ua.profitsoft.hw8.service.PepService;
+import ua.profitsoft.hw8.service.PepServiceImpl;
 import ua.profitsoft.hw8.util.FileUtils;
 import java.io.File;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/api/pep")
 @RequiredArgsConstructor
 public class PepController {
-    private final PepService service;
+    private final PepServiceImpl service;
 
     @PostMapping("/upload")
     public RestResponse upload(@RequestParam("file") MultipartFile file) {
