@@ -10,6 +10,14 @@ import java.nio.charset.StandardCharsets;
 public class TestUtil {
     public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    public static <T>T parseJson(String json, Class<T> c) {
+        try {
+            return OBJECT_MAPPER.readValue(json, c);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error parsing json", e);
+        }
+    }
+
     public static <T>T parseJson(String json, TypeReference<T> valueTypeRef) {
         try {
             return OBJECT_MAPPER.readValue(json, valueTypeRef);

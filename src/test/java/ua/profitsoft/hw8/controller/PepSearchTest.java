@@ -8,23 +8,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.validation.BindingResult;
 import ua.profitsoft.hw8.TestUtil;
 import ua.profitsoft.hw8.dto.PageDto;
 import ua.profitsoft.hw8.dto.PepInfoDto;
 import ua.profitsoft.hw8.dto.PepQueryDto;
+import ua.profitsoft.hw8.dto.RestResponse;
 import ua.profitsoft.hw8.repo.PepRepository;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 /**
- * Tests {@link PepController#findPeps(PepQueryDto) method}.
+ * Tests {@link PepController#findPeps(PepQueryDto, BindingResult)} (PepQueryDto) method}.
  */
 @SpringBootTest
 public class PepSearchTest extends AbstractControllerTest {
@@ -94,12 +94,37 @@ public class PepSearchTest extends AbstractControllerTest {
                       "size":"0"
                   }
                 """.formatted("Yevhenovych");
-        Exception thrown = assertThrows(Exception.class, () ->
-                mvc.perform(post("/api/pep/_search")
+        MockHttpServletResponse response = mvc.perform(post("/api/pep/_search")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(body)));
-        assertThat(thrown.getMessage()).isNotNull();
-        assertThat(thrown.getMessage().endsWith("Page size must not be less than one")).isTrue();
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse();
+        RestResponse res = TestUtil.parseJson(response.getContentAsString(), RestResponse.class);
+        String error = res.getResult().trim();
+        assertThat(error).isNotNull();
+        assertThat(error).isEqualTo("size - Page size cannot be less than 1;");
+    }
+
+    @Test
+    void searchPepInvalidPage() throws Exception {
+        pushSomePeps();
+        String body = """
+                  {
+                      "patronymic_en":"%s",
+                      "page":"-2"
+                  }
+                """.formatted("Yevhenovych");
+        MockHttpServletResponse response = mvc.perform(post("/api/pep/_search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andReturn()
+                .getResponse();
+        RestResponse res = TestUtil.parseJson(response.getContentAsString(), RestResponse.class);
+        String error = res.getResult().trim();
+        assertThat(error).isNotNull();
+        assertThat(error).isEqualTo("page - Page number cannot be less than 0;");
     }
 
     private void pushSomePeps() throws Exception {

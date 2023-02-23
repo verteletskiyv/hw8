@@ -1,6 +1,8 @@
 package ua.profitsoft.hw8.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +17,7 @@ import ua.profitsoft.hw8.service.PepServiceImpl;
 import ua.profitsoft.hw8.util.FileUtils;
 import java.io.File;
 import java.util.List;
+import static ua.profitsoft.hw8.controller.GlobalExceptionHandler.returnErrorsToClient;
 
 
 @RestController
@@ -42,7 +45,9 @@ public class PepController {
     }
 
     @PostMapping("/_search")
-    public PageDto<PepInfoDto> findPeps(@RequestBody PepQueryDto query) {
+    public PageDto<PepInfoDto> findPeps(@Valid @RequestBody PepQueryDto query, BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            returnErrorsToClient(bindingResult);
         return service.search(query);
     }
 }
